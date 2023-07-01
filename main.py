@@ -10,6 +10,7 @@ screen_width_start = 0
 screen_heigh_start = 0
 screen_width = 1280
 screen_heigh = 720
+screen_width_not_seen_end = -200
 screen = pygame.display.set_mode((screen_width, screen_heigh))
 #screen = pygame.display.set_mode((screen_width, screen_heigh). flags=pygame.NOFRAME) - без рамки
 
@@ -74,8 +75,8 @@ bg_grass_speed = 20
 bg_sound = pygame.mixer.Sound('sounds/soundtrack.mp3')
 bg_sound.play()
 
-
-
+rat_width_hitbox = 1265
+rat_heigh_hitbox = 450
 rat_timer = pygame.USEREVENT + 1
 rat_per_millisecond = 10000
 pygame.time.set_timer(rat_timer,rat_per_millisecond)
@@ -89,6 +90,8 @@ blasters_left = 5
 blast = pygame.image.load('images/blast.png').convert_alpha()
 blasts = []
 blast_speed = 11
+blast_width_hitbox = player_x + 100
+blast_heigh_hitbox = player_y + 127
 
 
 gameplay = True
@@ -123,14 +126,14 @@ while running:
 
         player_hitbox = walk_left[0].get_rect(topleft=(player_x, player_y))
         if rat_list_in_game:
-            for (i, el) in enumerate (rat_list_in_game):
-                screen.blit(rat, el)
-                el.x -= rat_speed
+            for (i, rat_hitbox) in enumerate (rat_list_in_game):
+                screen.blit(rat, rat_hitbox)
+                rat_hitbox.x -= rat_speed
 
-                if el.x < screen_width_start - 200:
+                if rat_hitbox.x < screen_width_not_seen_end:
                     rat_list_in_game.pop()
 
-                if player_hitbox.colliderect(el):
+                if player_hitbox.colliderect(rat_hitbox):
                     gameplay = False
 
         keys = pygame.key.get_pressed()
@@ -190,18 +193,18 @@ while running:
         #    blasts.append(blast.get_rect(topleft=(player_x+100,player_y+110)))
 
         if blasts:
-            for el in blasts:
-                screen.blit(blast,(el.x,el.y))
-                el.x += blast_speed
+            for blast_hitbox in blasts:
+                screen.blit(blast,(blast_hitbox.x,blast_hitbox.y))
+                blast_hitbox.x += blast_speed
 
-                if el.x > screen_width - 80:
+                if blast_hitbox.x > screen_width_not_seen_end:
                     blasts.pop(i)
                     blasters_left += 1
 
 
                 if rat_list_in_game:
-                    for (index, rat_el) in enumerate(rat_list_in_game):
-                        if el.colliderect(rat_el):
+                    for (index, rat_rat_hitbox) in enumerate(rat_list_in_game):
+                        if blast_hitbox.colliderect(rat_rat_hitbox):
                             rat_list_in_game.pop(index)
                             blasts.pop(i)
                             blasters_left += 1
@@ -236,8 +239,8 @@ while running:
             pygame.quit()
 
         if event.type == rat_timer:
-           rat_list_in_game.append(rat.get_rect(topleft=(screen_width - 15,screen_heigh - 270)))
+           rat_list_in_game.append(rat.get_rect(topleft=(rat_width_hitbox,screen_heigh)))
 
         if gameplay and event.type == pygame.KEYUP and event.key == pygame.K_f and blasters_left > 0:
-            blasts.append(blast.get_rect(topleft=(player_x + 100, player_y + 127)))
+            blasts.append(blast.get_rect(topleft=(blast_width_hitbox, blast_heigh_hitbox)))
             blasters_left -= 1
