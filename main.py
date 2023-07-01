@@ -10,7 +10,9 @@ screen_width_start = 0
 screen_heigh_start = 0
 screen_width = 1280
 screen_heigh = 720
-screen_width_not_seen_end = -200
+screen_width_not_see_start = screen_width_start - 200
+screen_width_not_see_end = 1360
+
 screen = pygame.display.set_mode((screen_width, screen_heigh))
 #screen = pygame.display.set_mode((screen_width, screen_heigh). flags=pygame.NOFRAME) - без рамки
 
@@ -22,10 +24,7 @@ pygame.display.set_icon(icon)
 #square = pygame.Surface((75,55))
 #square.fill('Blue')
 
-#myfont = pygame.font.Font('FontsText/SpaceMono-Regular.ttf',40)
-#text_surfase = myfont.render('Rikong love you',False,'Red','Blue')
-
-
+#гравець
 player = pygame.image.load('images/player_right/right_1.png')
 player_anim_count = 0
 player_speed = 15
@@ -34,6 +33,8 @@ player_y = 420
 player_x_min = 0
 player_x_max = 600
 
+
+#пересування гравця
 walk_left = [
     pygame.image.load('images/player_left/left_1.png').convert_alpha(),
     pygame.image.load('images/player_left/left_2.png').convert_alpha(),
@@ -53,7 +54,7 @@ jump_count_start = 15
 jump_count = jump_count_start
 
 
-
+#картинки заднього фону
 bg_width_start = 0
 bg_width_end = 2500
 
@@ -72,21 +73,23 @@ bg_mountain_front_speed = 10
 bg_grass_speed = 20
 
 
+#музика
 bg_sound = pygame.mixer.Sound('sounds/soundtrack.mp3')
 bg_sound.play()
 
+#пацюк
 rat_width_hitbox = 1265
 rat_heigh_hitbox = 450
 rat_timer = pygame.USEREVENT + 1
-rat_per_millisecond = 10000
-pygame.time.set_timer(rat_timer,rat_per_millisecond)
 rat = pygame.image.load('images/rat.png').convert_alpha()
-#rat x and y = 1290,450
 rat_list_in_game =[]
 rat_speed = 20
+rat_per_millisecond = 5000
+pygame.time.set_timer(rat_timer,rat_per_millisecond)
 
 
-blasters_left = 5
+#бластер
+blasters_left = 3
 blast = pygame.image.load('images/blast.png').convert_alpha()
 blasts = []
 blast_speed = 11
@@ -96,21 +99,25 @@ blast_heigh_hitbox = player_y + 127
 
 gameplay = True
 
+#текст - налаштування і місцезнаходження
 label_text_size = 200
 label = pygame.font.Font('FontsText/VT323-Regular.ttf',label_text_size)
-lose_label = label.render('You lose!',False,"Black")
-restart_label = label.render('Restart',False,"Black")
+lose_label = label.render('lose',False,"Black")
+restart_label = label.render('restart',False,"Black")
 restart_screen = pygame.image.load('images/lose_screen.png')
 
 lose_label_location = (30,40)
 restart_label_location = (30,200)
 restart_label_rect = restart_label.get_rect(topleft=(restart_label_location))
+#myfont = pygame.font.Font('FontsText/SpaceMono-Regular.ttf',40)
+#text_surfase = myfont.render('Rikong love you',False,'Red','Blue')
 
 
-
+#button = {'jump': 'pygame.K_SPACE'}
 
 running = True
 while running:
+
 
     #рух фону
     screen.blit(bg_sky, (bg_sky_x, bg_width_start))
@@ -125,17 +132,20 @@ while running:
     if gameplay:
 
         player_hitbox = walk_left[0].get_rect(topleft=(player_x, player_y))
+
+        #пацюк - в яких випадках зникає або закінчує гру
         if rat_list_in_game:
-            for (i, rat_hitbox) in enumerate (rat_list_in_game):
-                screen.blit(rat, rat_hitbox)
-                rat_hitbox.x -= rat_speed
+            for (i, el) in enumerate (rat_list_in_game):
+                screen.blit(rat, el)
+                el.x -= rat_speed
 
-                if rat_hitbox.x < screen_width_not_seen_end:
-                    rat_list_in_game.pop()
+                if el.x < screen_width_not_see_start:
+                    rat_list_in_game.pop(i)
 
-                if player_hitbox.colliderect(rat_hitbox):
+                if player_hitbox.colliderect(el):
                     gameplay = False
 
+        #кнопки
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:  # left
             screen.blit(walk_left[player_anim_count], (player_x, player_y))
@@ -149,6 +159,7 @@ while running:
             player_x += player_speed
 
         if not is_jump:
+            #if keys[pygame.button ((button['jump']))]:
             if keys[pygame.K_SPACE]:
                 is_jump = True
 
@@ -193,20 +204,20 @@ while running:
         #    blasts.append(blast.get_rect(topleft=(player_x+100,player_y+110)))
 
         if blasts:
-            for blast_hitbox in blasts:
-                screen.blit(blast,(blast_hitbox.x,blast_hitbox.y))
-                blast_hitbox.x += blast_speed
+            for el in blasts:
+                screen.blit(blast,(el.x,el.y))
+                el.x += blast_speed
 
-                if blast_hitbox.x > screen_width_not_seen_end:
+                if el.x > screen_width_not_see_end:
                     blasts.pop(i)
                     blasters_left += 1
 
 
                 if rat_list_in_game:
-                    for (index, rat_rat_hitbox) in enumerate(rat_list_in_game):
-                        if blast_hitbox.colliderect(rat_rat_hitbox):
-                            rat_list_in_game.pop(index)
-                            blasts.pop(i)
+                    for (idex, rat_el) in enumerate(rat_list_in_game):
+                        if el.colliderect(rat_el):
+                            rat_list_in_game.pop(idex)
+                            blasts.pop(idex)
                             blasters_left += 1
 
         # rat_x -= 17
@@ -239,8 +250,8 @@ while running:
             pygame.quit()
 
         if event.type == rat_timer:
-           rat_list_in_game.append(rat.get_rect(topleft=(rat_width_hitbox,screen_heigh)))
+            rat_list_in_game.append(rat.get_rect(topleft=(rat_width_hitbox, rat_heigh_hitbox)))
 
         if gameplay and event.type == pygame.KEYUP and event.key == pygame.K_f and blasters_left > 0:
-            blasts.append(blast.get_rect(topleft=(blast_width_hitbox, blast_heigh_hitbox)))
+            blasts.append(blast.get_rect(topleft=(player_x + 100, player_y + 127)))
             blasters_left -= 1
