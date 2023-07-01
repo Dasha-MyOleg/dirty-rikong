@@ -1,3 +1,4 @@
+from typing import Dict, Any
 
 import pygame
 
@@ -102,7 +103,7 @@ gameplay = True
 #текст - налаштування і місцезнаходження
 label_text_size = 200
 label = pygame.font.Font('FontsText/VT323-Regular.ttf',label_text_size)
-lose_label = label.render('lose',False,"Black")
+lose_label = label.render('You lose!',False,"Black")
 restart_label = label.render('restart',False,"Black")
 restart_screen = pygame.image.load('images/lose_screen.png')
 
@@ -113,7 +114,8 @@ restart_label_rect = restart_label.get_rect(topleft=(restart_label_location))
 #text_surfase = myfont.render('Rikong love you',False,'Red','Blue')
 
 
-#button = {'jump': 'pygame.K_SPACE'}
+#if keys[pygame.K_a] and player_x > player_x_min:
+
 
 running = True
 while running:
@@ -128,6 +130,8 @@ while running:
     screen.blit(bg_mountain_front, (bg_mountain_front_x + bg_width_end, bg_width_start))
     screen.blit(bg_grass, (bg_grass_x, bg_width_start))
     screen.blit(bg_grass, (bg_grass_x + bg_width_end, bg_width_start))
+
+
 
     if gameplay:
 
@@ -147,7 +151,14 @@ while running:
 
         #кнопки
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:  # left
+
+        #button: dict[str, Any] = {"jump", keys[pygame.K_SPACE],
+        #                          "go_left", keys[pygame.K_a],
+        #                          "go_right", keys[pygame.K_d]}
+
+
+        if keys[pygame.K_a]: # left
+        #if button["go_left"]:
             screen.blit(walk_left[player_anim_count], (player_x, player_y))
         else:
             screen.blit(walk_right[player_anim_count], (player_x, player_y))
@@ -158,8 +169,12 @@ while running:
         elif keys[pygame.K_d] and player_x < player_x_max:
             player_x += player_speed
 
+
+
+        #прижок
+
         if not is_jump:
-            #if keys[pygame.button ((button['jump']))]:
+            #if button["jump"]:
             if keys[pygame.K_SPACE]:
                 is_jump = True
 
@@ -174,11 +189,14 @@ while running:
                 is_jump = False
                 jump_count = jump_high = jump_count_start
 
+        #анімація гравця
         if player_anim_count == 3:
             player_anim_count = 0
         else:
             player_anim_count += 1
 
+
+        #задній фон - рух
         bg_sky_x -= bg_sky_speed
         if bg_sky_x == -bg_width_end:
            bg_sky_x = bg_width_start
@@ -196,13 +214,8 @@ while running:
            bg_grass_x = bg_width_start
 
 
-        #screen.blit(blast_label, "blasters_left", (400, 100))
 
-
-
-        #if keys[pygame.K_f]:
-        #    blasts.append(blast.get_rect(topleft=(player_x+100,player_y+110)))
-
+        #бластери/постріли
         if blasts:
             for el in blasts:
                 screen.blit(blast,(el.x,el.y))
@@ -212,7 +225,7 @@ while running:
                     blasts.pop(i)
                     blasters_left += 1
 
-
+                #якщо постріл попаде в пацюка
                 if rat_list_in_game:
                     for (idex, rat_el) in enumerate(rat_list_in_game):
                         if el.colliderect(rat_el):
@@ -220,12 +233,13 @@ while running:
                             blasts.pop(idex)
                             blasters_left += 1
 
-        # rat_x -= 17
-
         #screen.blit(square, (230, 380))
 
+        #фпс гри
         clock.tick(game_speed)
 
+
+    #екран програшу
     else:
 
         screen.blit(restart_screen, (screen_width_start,screen_heigh_start))
@@ -249,9 +263,12 @@ while running:
             running = False
             pygame.quit()
 
+
+        #де з'являються пацюки
         if event.type == rat_timer:
             rat_list_in_game.append(rat.get_rect(topleft=(rat_width_hitbox, rat_heigh_hitbox)))
 
+        #обмеження кікості бластерів/пострілів і де вони з'являються
         if gameplay and event.type == pygame.KEYUP and event.key == pygame.K_f and blasters_left > 0:
             blasts.append(blast.get_rect(topleft=(player_x + 100, player_y + 127)))
             blasters_left -= 1
