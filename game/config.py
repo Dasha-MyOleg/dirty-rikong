@@ -6,7 +6,7 @@ pygame.init()
 
 
 clock = pygame.time.Clock()
-game_speed = 9
+GAME_SPEED = 9
 
 
 def load_image(path, alpha=True):
@@ -33,6 +33,7 @@ pygame.display.set_caption(PgDisplay.CAPTION)
 icon = load_image('images/icon.png')
 pygame.display.set_icon(icon)
 
+
 class Player:
     ANIMATION_COUNT = 0
     SPEED = 15
@@ -45,6 +46,8 @@ class Player:
 class Images:
     # base folder
     BASE_DIR = 'images/'
+    # background folder
+    BG_DIR = BASE_DIR + 'bg/'
 
     # game
     PYGAME_ICON = BASE_DIR + 'icon.png'
@@ -57,7 +60,8 @@ class Images:
     PLAYER_BASE      = PLAYER_R_DIR + 'right_1.png'
 
     PLAYER_STAY = [
-        'stay_1.png',]
+        'stay_1.png',
+    ]
 
     PLAYER_L = [
         'left_1.png',
@@ -73,39 +77,12 @@ class Images:
         'right_4.png',
     ]
 
-    # full paths
-    PLAYER_STAY = [PLAYER_STAY_DIR + x for x in PLAYER_STAY]
-    PLAYER_L_WALK = [PLAYER_L_DIR + x for x in PLAYER_L]
-    PLAYER_R_WALK = [PLAYER_R_DIR + x for x in PLAYER_R]
 
-    # background folder
-    BG_DIR = BASE_DIR + 'bg/'
+PLAYER_STAY = [Images.PLAYER_STAY_DIR + x for x in Images.PLAYER_STAY]
+PLAYER_L_WALK = [Images.PLAYER_L_DIR + x for x in Images.PLAYER_L]
+PLAYER_R_WALK = [Images.PLAYER_R_DIR + x for x in Images.PLAYER_R]
 
 
-#гравець
-player = load_image(Images.PLAYER_BASE, alpha=False)
-player_speed = 15
-
-
-#пересування гравця
-stay  = [load_image(x) for x in Images.PLAYER_STAY]
-#walk_left  = [load_image(x) for x in Images.PLAYER_L_WALK]
-walk_right = [load_image(x) for x in Images.PLAYER_R_WALK]
-
-
-walk_left = []
-for x in Images.PLAYER_L_WALK:
-    img = load_image(x)
-    walk_left.append(img)
-
-
-
-is_jump = False
-jump_count_start = 15
-jump_count = jump_count_start
-
-
-#картинки заднього фону
 class Background:
     BG_WIDTH_START = 0
     BG_WIDTH_END = 2500
@@ -125,39 +102,88 @@ class Background:
     BG_GRASS_SPEED = 20
 
 
+#гравець
+player = load_image(Images.PLAYER_BASE, alpha=False)
+player_speed = 15
+
+
+#пересування гравця
+stay  = [load_image(x) for x in PLAYER_STAY]
+#walk_left  = [load_image(x) for x in PLAYER_L_WALK]
+walk_right = [load_image(x) for x in PLAYER_R_WALK]
+
+
+walk_left = []
+for x in PLAYER_L_WALK:
+    img = load_image(x)
+    walk_left.append(img)
+
+
+class jump:
+    IS_JUMP = False
+    JUMP_COUNT_START = 15
+    JUMP_COUNT = JUMP_COUNT_START
+
+
+
+#картинки заднього фону
+
+
+
 #музика
 bg_sound = pygame.mixer.Sound('sounds/soundtrack.mp3')
 bg_sound.play()
 
 #пацюк
-rat_width_hitbox = 1265
-rat_heigh_hitbox = 450
-rat_timer = pygame.USEREVENT + 1
-rat = pygame.image.load('images/rat.png').convert_alpha()
-rat_list_in_game =[]
-rat_speed = 20
-rat_per_millisecond = 5000
-pygame.time.set_timer(rat_timer,rat_per_millisecond)
+class rat:
+    RAT_WIDTH_HITBOX = 1265
+    RAT_HEIGHT_HITBOX = 450
+    RAT_TIMER = pygame.USEREVENT + 1
+    RAT = pygame.image.load('images/rat.png').convert_alpha()
+    RAT_LIST_IN_GAME = []
+    RAT_SPEED = 20
+    RAT_PER_MILLISECOND = 5000
+    pygame.time.set_timer(RAT_TIMER, RAT_PER_MILLISECOND)
+
 
 
 #бластер
-blasters_left = 3
-blast = pygame.image.load('images/blast.png').convert_alpha()
-blasts = []
-blast_speed = 11
-blast_width_hitbox = Player.X + 100
-blast_heigh_hitbox = Player.Y + 127
+class blasters:
+    BLASTERS_LEFT = 3
+    BLAST = pygame.image.load('images/blast.png').convert_alpha()
+    BLASTS = []
+    BLAST_SPEED = 11
+    BLAST_WIDTH_HITBOX = Player.X + 100
+    BLAST_HEIGHT_HITBOX= Player.Y + 127
 
 
-gameplay = True
+
 
 #текст - налаштування і місцезнаходження
 label_text_size = 200
-label = pygame.font.Font('FontsText/VT323-Regular.ttf',label_text_size)
-lose_label = label.render('You lose!',False,"Black")
-restart_label = label.render('restart',False,"Black")
+label          = pygame.font.Font('FontsText/VT323-Regular.ttf',label_text_size)
+lose_label     = label.render('You lose!',False,"Black")
+restart_label  = label.render('restart',False,"Black")
 restart_screen = pygame.image.load('images/lose_screen.png')
 
 lose_label_location = (30,40)
 restart_label_location = (30,200)
 restart_label_rect = restart_label.get_rect(topleft=(restart_label_location))
+
+def bg_animation():
+    """
+    Background animation.
+    Used as a base background screen throughout the game.
+    Contains grass, mountains and sky.
+    """
+    width = Background.BG_WIDTH_START
+
+    screen.blit(Background.BG_SKY, (Background.BG_SKY_X, width))
+    screen.blit(Background.BG_SKY, (Background.BG_SKY_X + Background.BG_WIDTH_END, Background.BG_WIDTH_START))
+    screen.blit(Background.BG_MOUNTAIN_BACK, (Background.BG_MOUNTAIN_BACK_X, Background.BG_WIDTH_START))
+    screen.blit(Background.BG_MOUNTAIN_BACK, (Background.BG_MOUNTAIN_BACK_X + Background.BG_WIDTH_END, Background.BG_WIDTH_START))
+    screen.blit(Background.BG_MOUNTAIN_FRONT, (Background.BG_MOUNTAIN_FRONT_X, Background.BG_WIDTH_START))
+    screen.blit(Background.BG_MOUNTAIN_FRONT, (Background.BG_MOUNTAIN_FRONT_X + Background.BG_WIDTH_END, Background.BG_WIDTH_START))
+    screen.blit(Background.BG_GRASS, (Background.BG_GRASS_X, Background.BG_WIDTH_START))
+    screen.blit(Background.BG_GRASS, (Background.BG_GRASS_X + Background.BG_WIDTH_END, Background.BG_WIDTH_START))
+
