@@ -1,5 +1,5 @@
 
-from typing import Dict, Any
+#from typing import Dict, Any
 
 import pygame
 pygame.init()
@@ -84,18 +84,12 @@ class Images:
 
 #гравець
 player = load_image(Images.PLAYER_BASE, alpha=False)
-
-player_anim_count = 0
 player_speed = 15
-player_x = 10
-player_y = 420
-player_x_min = 0
-player_x_max = 600
 
 
 #пересування гравця
 stay  = [load_image(x) for x in Images.PLAYER_STAY]
-walk_left  = [load_image(x) for x in Images.PLAYER_L_WALK]
+#walk_left  = [load_image(x) for x in Images.PLAYER_L_WALK]
 walk_right = [load_image(x) for x in Images.PLAYER_R_WALK]
 
 
@@ -112,22 +106,23 @@ jump_count = jump_count_start
 
 
 #картинки заднього фону
-bg_width_start = 0
-bg_width_end = 2500
+class Background:
+    BG_WIDTH_START = 0
+    BG_WIDTH_END = 2500
 
-bg_sky = pygame.image.load('images/bg/bg_sky.png').convert_alpha()
-bg_sky_x=0
-bg_mountain_back = pygame.image.load('images/bg/bg_mountain_back.png').convert_alpha()
-bg_mountain_back_x=0
-bg_mountain_front = pygame.image.load('images/bg/bg_mountain_front.png').convert_alpha()
-bg_mountain_front_x=0
-bg_grass = pygame.image.load('images/bg/bg_grass.png').convert_alpha()
-bg_grass_x=0
+    BG_SKY = pygame.image.load('images/bg/bg_sky.png').convert_alpha()
+    BG_SKY_X = 0
+    BG_MOUNTAIN_BACK = pygame.image.load('images/bg/bg_mountain_back.png').convert_alpha()
+    BG_MOUNTAIN_BACK_X = 0
+    BG_MOUNTAIN_FRONT = pygame.image.load('images/bg/bg_mountain_front.png').convert_alpha()
+    BG_MOUNTAIN_FRONT_X = 0
+    BG_GRASS = pygame.image.load('images/bg/bg_grass.png').convert_alpha()
+    BG_GRASS_X = 0
 
-bg_sky_speed = 2
-bg_mountain_back_speed = 4
-bg_mountain_front_speed = 10
-bg_grass_speed = 20
+    BG_SKY_SPEED = 2
+    BG_MOUNTAIN_BACK_SPEED = 4
+    BG_MOUNTAIN_FRONT_SPEED = 10
+    BG_GRASS_SPEED = 20
 
 
 #музика
@@ -150,8 +145,8 @@ blasters_left = 3
 blast = pygame.image.load('images/blast.png').convert_alpha()
 blasts = []
 blast_speed = 11
-blast_width_hitbox = player_x + 100
-blast_heigh_hitbox = player_y + 127
+blast_width_hitbox = Player.X + 100
+blast_heigh_hitbox = Player.Y + 127
 
 
 gameplay = True
