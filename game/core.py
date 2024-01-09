@@ -63,16 +63,15 @@ def run_game():
                     config.jump.IS_JUMP = True
 
             else:
-
-                if config.jump.IS_JUMP >= -config.jump.JUMP_COUNT_START:
+                if config.jump.JUMP_COUNT >= -config.jump.JUMP_COUNT_START:
                     if config.jump.JUMP_COUNT > 0:
-                        config.Player.Y -= (config.jump.JUMP_COUNT ** 1.8) / 3
+                        config.Player.Y -= (config.jump.JUMP_COUNT ** 2) / 3
                     else:
-                        config.Player.Y += (config.jump.JUMP_COUNT) ** 2/ 0.5
+                        config.Player.Y += (config.jump.JUMP_COUNT ** 2) / 3
                     config.jump.JUMP_COUNT -= 1
                 else:
                     config.jump.IS_JUMP = False
-                    config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
+                    config.jump.JUMP_COUNT = jump_high = config.jump.JUMP_COUNT_START
 
 
 
