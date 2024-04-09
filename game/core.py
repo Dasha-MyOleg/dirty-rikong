@@ -9,8 +9,6 @@ def run_game():
 
     while running:
 
-
-
         #рух фону
         bg_animation()
 
@@ -19,10 +17,7 @@ def run_game():
 
 
             #пацюк в яких випадках зникає або закінчує гру
-            # Rat logic and conditions:
-            # If rat is in the game - remove it,
-            # otherwise put 3 on top.
-            # We expect player to be ready for this.
+
             if config.rat.RAT_LIST_IN_GAME:
                 for (i, el) in enumerate(config.rat.RAT_LIST_IN_GAME):
                     screen.blit(config.rat.RAT, el)
@@ -37,17 +32,40 @@ def run_game():
             #кнопки
             keys = pygame.key.get_pressed()
 
-            #button: dict[str, Any] = {"jump", keys[pygame.K_SPACE],
-            #                          "go_left", keys[pygame.K_a],
-            #                          "go_right", keys[pygame.K_d]}
+            if keys[pygame.K_a] and not keys[pygame.K_SPACE] and not Player.Y < 300:
+                screen.blit(walk_left[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_LEFT)],
+                            (config.Player.X, config.Player.Y))
 
-            if keys[pygame.K_a]:
-                screen.blit(walk_left[config.Player.ANIMATION_COUNT], (config.Player.X, config.Player.Y))
-            else:
-                screen.blit(walk_right [config.Player.ANIMATION_COUNT], (config.Player.X, config.Player.Y))
+            if keys[pygame.K_d] and not keys[pygame.K_SPACE] and not Player.Y < 300:
+                screen.blit(walk_right[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_RIGHT)],
+                            (config.Player.X, config.Player.Y))
 
-            if keys[pygame.K_d]:
-                screen.blit(walk_right[config.Player.ANIMATION_COUNT], (config.Player.X, config.Player.Y))
+            if keys[pygame.K_SPACE] or Player.Y < 300:
+                screen.blit(walk_jump[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_JUMP)],
+                            (config.Player.X, config.Player.Y))
+
+
+
+
+                # Анімація, коли не натискається жодна кнопка
+            if not keys[pygame.K_a] and not keys[pygame.K_d] and not keys[pygame.K_SPACE] and not Player.Y < 300:
+                screen.blit(walk_right[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_RIGHT)],
+                            (config.Player.X, config.Player.Y))
+
+
+
+
+
+                # Check if the player is on the ground to reset jump count
+            if config.Player.Y >= 420:
+                config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
+                config.jump.IS_JUMP = False
+
+                # Handle jump logic
+            if not config.jump.IS_JUMP:
+                if keys[pygame.K_SPACE]:
+                    config.jump.IS_JUMP = True
+
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_a] and config.Player.X > config.Player.X_MIN:
@@ -57,35 +75,41 @@ def run_game():
 
 
 
-                # прижок
-            if not config.jump.IS_JUMP:
-                if keys[pygame.K_SPACE]:
-                    config.jump.IS_JUMP = True
 
-            else:
+            # Перевірка, чи може гравець стрибнути
+            if not config.jump.IS_JUMP and keys[pygame.K_SPACE]:
+                config.jump.IS_JUMP = True
+
+            # Логіка прижку
+            if config.jump.IS_JUMP:
                 if config.jump.JUMP_COUNT >= -config.jump.JUMP_COUNT_START:
                     if config.jump.JUMP_COUNT > 0:
                         config.Player.Y -= (config.jump.JUMP_COUNT ** 2) / 3
+                        # Перевірка, чи досягнуто максимальної висоти
+                        if config.jump.JUMP_COUNT == 1:
+                            # Встановлення анімації прижку до максимальної висоти
+                            config.Player.ANIMATION_COUNT = ANIMATION_COUNT.ANIMATION_COUNT_JUMP
                     else:
                         config.Player.Y += (config.jump.JUMP_COUNT ** 2) / 3
                     config.jump.JUMP_COUNT -= 1
                 else:
                     config.jump.IS_JUMP = False
-                    config.jump.JUMP_COUNT = jump_high = config.jump.JUMP_COUNT_START
+                    config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
 
 
 
-                #else:
-                 #   config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
-                  #  config.jump.IS_JUMP = False
 
 
+    #перебирання кадрів гравця
 
-    #анімація гравця
-            if Player.ANIMATION_COUNT == 3:
-                Player.ANIMATION_COUNT = 0
+
+            # Оновлення лічильника анімації
+            if config.Player.ANIMATION_COUNT >= max(ANIMATION_COUNT.ANIMATION_COUNT_LEFT,
+                                                    ANIMATION_COUNT.ANIMATION_COUNT_RIGHT,
+                                                    ANIMATION_COUNT.ANIMATION_COUNT_JUMP):
+                config.Player.ANIMATION_COUNT = 0
             else:
-                Player.ANIMATION_COUNT += 1
+                config.Player.ANIMATION_COUNT += 1
 
 
     # задній фон рух
@@ -106,27 +130,25 @@ def run_game():
                 config.Background.BG_GRASS_X = config.Background.BG_WIDTH_START
 
 
-
             #бластери/постріли
-            blasts_to_remove = []
 
+            blasts_copy = config.blasters.BLASTS.copy()
 
-            if config.blasters.BLASTS:
-                for el in config.blasters.BLASTS:
-                    screen.blit(config.blasters.BLAST, (el.x, el.y))
-                    el.x += config.blasters.BLAST_SPEED
+            for el in blasts_copy:
+                screen.blit(config.blasters.BLAST, (el.x, el.y))
+                el.x += config.blasters.BLAST_SPEED
 
-                    if el.x > config.ScConfig.HIDDEN_SIZE[1]:
-                        config.blasters.BLASTS.pop()
-                        config.blasters.BLASTERS_LEFT += 1
+                if el.x > config.ScConfig.HIDDEN_SIZE[1]:
+                    # Видаляємо елемент з оригінального списку
+                    config.blasters.BLASTS.remove(el)
+                    config.blasters.BLASTERS_LEFT += 1
 
-
-                    if config.rat.RAT_LIST_IN_GAME:
-                        for (idex, rat_el) in enumerate(config.rat.RAT_LIST_IN_GAME):
-                            if el.colliderect(rat_el):
-                                config.rat.RAT_LIST_IN_GAME.pop(idex)
-                                config.blasters.BLASTS.pop(idex)
-                                config.blasters.BLASTERS_LEFT += 1
+                if config.rat.RAT_LIST_IN_GAME:
+                    for (idex, rat_el) in enumerate(config.rat.RAT_LIST_IN_GAME):
+                        if el.colliderect(rat_el):
+                            config.rat.RAT_LIST_IN_GAME.pop(idex)
+                            config.blasters.BLASTS.remove(el)
+                            config.blasters.BLASTERS_LEFT += 1
 
 
             #screen.blit(square, (230, 380))

@@ -6,7 +6,7 @@ pygame.init()
 
 
 clock = pygame.time.Clock()
-GAME_SPEED = 9
+GAME_SPEED = 17
 
 
 def load_image(path, alpha=True):
@@ -36,11 +36,11 @@ pygame.display.set_icon(icon)
 
 class Player:
     ANIMATION_COUNT = 0
-    SPEED = 15
+    SPEED = 4
     X = 10
     Y = 420
     X_MIN = 0
-    X_MAX = 600
+    X_MAX = 1100
 
 
 class Images:
@@ -53,14 +53,15 @@ class Images:
     PYGAME_ICON = BASE_DIR + 'icon.png'
 
     # player folder
-    PLAYER_STAY_DIR = BASE_DIR + 'player_stay/'
+    PLAYER_JUMP_DIR = BASE_DIR + 'player_jump/'
     PLAYER_L_DIR = BASE_DIR + 'player_left/'
     PLAYER_R_DIR = BASE_DIR + 'player_right/'
 
     PLAYER_BASE      = PLAYER_R_DIR + 'right_1.png'
 
-    PLAYER_STAY = [
-        'stay_1.png',
+    PLAYER_JUMP = [
+        'jump_1.png',
+        'jump_2.png',
     ]
 
     PLAYER_L = [
@@ -78,7 +79,7 @@ class Images:
     ]
 
 
-PLAYER_STAY = [Images.PLAYER_STAY_DIR + x for x in Images.PLAYER_STAY]
+PLAYER_JUMP_WALK = [Images.PLAYER_JUMP_DIR + x for x in Images.PLAYER_JUMP]
 PLAYER_L_WALK = [Images.PLAYER_L_DIR + x for x in Images.PLAYER_L]
 PLAYER_R_WALK = [Images.PLAYER_R_DIR + x for x in Images.PLAYER_R]
 
@@ -104,11 +105,11 @@ class Background:
 
 #гравець
 player = load_image(Images.PLAYER_BASE, alpha=False)
-player_speed = 15
+player_speed = 14
 
 
 #пересування гравця
-stay  = [load_image(x) for x in PLAYER_STAY]
+#walk_jump  = [load_image(x) for x in PLAYER_JUMP_WALK]
 #walk_left  = [load_image(x) for x in PLAYER_L_WALK]
 walk_right = [load_image(x) for x in PLAYER_R_WALK]
 
@@ -118,6 +119,10 @@ for x in PLAYER_L_WALK:
     img = load_image(x)
     walk_left.append(img)
 
+walk_jump = []
+for x in PLAYER_JUMP_WALK:
+    img = load_image(x)
+    walk_jump.append(img)
 
 class jump:
     IS_JUMP = False
@@ -152,9 +157,15 @@ class blasters:
     BLASTERS_LEFT = 3
     BLAST = pygame.image.load('images/blast.png').convert_alpha()
     BLASTS = []
-    BLAST_SPEED = 11
+    BLAST_SPEED = 27
     BLAST_WIDTH_HITBOX = Player.X + 100
     BLAST_HEIGHT_HITBOX= Player.Y + 127
+
+class ANIMATION_COUNT:
+    ANIMATION_COUNT_JUMP = 1
+    ANIMATION_COUNT_LEFT = 3
+    ANIMATION_COUNT_RIGHT = 3
+
 
 
 
