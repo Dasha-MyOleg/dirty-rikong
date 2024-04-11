@@ -45,11 +45,9 @@ def run_game():
                             (config.Player.X, config.Player.Y))
 
 
-
-
                 # Анімація, коли не натискається жодна кнопка
             if not keys[pygame.K_a] and not keys[pygame.K_d] and not keys[pygame.K_SPACE] and not Player.Y < 300:
-                screen.blit(walk_right[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_RIGHT)],
+                screen.blit(walk_stay[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_STAY )],
                             (config.Player.X, config.Player.Y))
 
 
@@ -106,7 +104,8 @@ def run_game():
             # Оновлення лічильника анімації
             if config.Player.ANIMATION_COUNT >= max(ANIMATION_COUNT.ANIMATION_COUNT_LEFT,
                                                     ANIMATION_COUNT.ANIMATION_COUNT_RIGHT,
-                                                    ANIMATION_COUNT.ANIMATION_COUNT_JUMP):
+                                                    ANIMATION_COUNT.ANIMATION_COUNT_JUMP,
+                                                    ANIMATION_COUNT.ANIMATION_COUNT_STAY):
                 config.Player.ANIMATION_COUNT = 0
             else:
                 config.Player.ANIMATION_COUNT += 1

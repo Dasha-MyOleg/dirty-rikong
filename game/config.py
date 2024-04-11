@@ -53,11 +53,21 @@ class Images:
     PYGAME_ICON = BASE_DIR + 'icon.png'
 
     # player folder
+    PLAYER_STAY_DIR = BASE_DIR + 'player_stay/'
     PLAYER_JUMP_DIR = BASE_DIR + 'player_jump/'
     PLAYER_L_DIR = BASE_DIR + 'player_left/'
     PLAYER_R_DIR = BASE_DIR + 'player_right/'
 
     PLAYER_BASE      = PLAYER_R_DIR + 'right_1.png'
+
+    PLAYER_STAY = [
+        'stay_1.png',
+        'stay_2.png',
+        'stay_3.png',
+        'stay_4.png',
+        'stay_5.png',
+        'stay_6.png',
+    ]
 
     PLAYER_JUMP = [
         'jump_1.png',
@@ -79,6 +89,7 @@ class Images:
     ]
 
 
+PLAYER_STAY_WALK = [Images.PLAYER_STAY_DIR + x for x in Images.PLAYER_STAY]
 PLAYER_JUMP_WALK = [Images.PLAYER_JUMP_DIR + x for x in Images.PLAYER_JUMP]
 PLAYER_L_WALK = [Images.PLAYER_L_DIR + x for x in Images.PLAYER_L]
 PLAYER_R_WALK = [Images.PLAYER_R_DIR + x for x in Images.PLAYER_R]
@@ -109,10 +120,15 @@ player_speed = 14
 
 
 #пересування гравця
-#walk_jump  = [load_image(x) for x in PLAYER_JUMP_WALK]
 #walk_left  = [load_image(x) for x in PLAYER_L_WALK]
+# #walk_jump  = [load_image(x) for x in PLAYER_JUMP_WALK]
+
 walk_right = [load_image(x) for x in PLAYER_R_WALK]
 
+walk_stay = []
+for x in PLAYER_STAY_WALK:
+    img = load_image(x)
+    walk_stay.append(img)
 
 walk_left = []
 for x in PLAYER_L_WALK:
@@ -165,6 +181,8 @@ class ANIMATION_COUNT:
     ANIMATION_COUNT_JUMP = 1
     ANIMATION_COUNT_LEFT = 3
     ANIMATION_COUNT_RIGHT = 3
+    ANIMATION_COUNT_STAY = 5
+
 
 
 
