@@ -6,6 +6,7 @@ from . import config
 def run_game():
     running = True
     gameplay = True
+    attacking_animation_playing = False
 
     while running:
 
@@ -29,28 +30,48 @@ def run_game():
                     if player_hitbox.colliderect(el):
                         gameplay = False
 
-            #кнопки
+            #анімації на кнопках
             keys = pygame.key.get_pressed()
 
-            if keys[pygame.K_a] and not keys[pygame.K_SPACE] and not Player.Y < 300:
+
+
+            if keys[pygame.K_a] and not keys[pygame.K_SPACE] and not keys[pygame.K_f] and Player.Y >= 300 and not attacking_animation_playing:
                 screen.blit(walk_left[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_LEFT)],
                             (config.Player.X, config.Player.Y))
-
-            if keys[pygame.K_d] and not keys[pygame.K_SPACE] and not Player.Y < 300:
+            elif keys[pygame.K_d] and not keys[pygame.K_SPACE] and not keys[pygame.K_f] and Player.Y >= 300 and not attacking_animation_playing:
                 screen.blit(walk_right[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_RIGHT)],
                             (config.Player.X, config.Player.Y))
-
-            if keys[pygame.K_SPACE] or Player.Y < 300:
+            elif keys[pygame.K_SPACE] or Player.Y >= 520 and not attacking_animation_playing:
                 screen.blit(walk_jump[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_JUMP)],
                             (config.Player.X, config.Player.Y))
-
-
-                # Анімація, коли не натискається жодна кнопка
-            if not keys[pygame.K_a] and not keys[pygame.K_d] and not keys[pygame.K_SPACE] and not Player.Y < 300:
-                screen.blit(walk_stay[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_STAY )],
+            elif keys[pygame.K_f] and config.blasters.BLASTERS_LEFT > 0:
+                 # Запустіть анімацію атаки, якщо вона ще не програвається
+                    if not attacking_animation_playing:
+                        attacking_animation_playing = True
+                        attacking_animation_frame = 0
+            else:
+                if Player.Y >= 301 and not attacking_animation_playing:
+                    screen.blit(walk_stay[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_STAY)],
                             (config.Player.X, config.Player.Y))
+                else:
+                    if not attacking_animation_playing:
+                        screen.blit(walk_jump[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_JUMP)],
+                                 (config.Player.X, config.Player.Y))
 
 
+
+                # Якщо анімація атаки програється, відображайте кадр анімації
+                if attacking_animation_playing:
+                    # Перевірте, чи пройшов кінець анімації атаки
+                    if attacking_animation_frame >= config.ANIMATION_COUNT.ANIMATION_COUNT_ATTACKING:
+                        attacking_animation_playing = False  # Зупиніть анімацію атаки
+                        attacking_animation_frame = 0  # Скинути кадр анімації атаки
+                    else:
+                        # Відобразіть поточний кадр анімації атаки
+                        screen.blit(
+                            walk_attacking[min(attacking_animation_frame, config.ANIMATION_COUNT.ANIMATION_COUNT_ATTACKING)],
+                            (config.Player.X, config.Player.Y))
+                        attacking_animation_frame += 1
 
 
 
@@ -59,24 +80,17 @@ def run_game():
                 config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
                 config.jump.IS_JUMP = False
 
-                # Handle jump logic
-            if not config.jump.IS_JUMP:
-                if keys[pygame.K_SPACE]:
-                    config.jump.IS_JUMP = True
 
-
-            keys = pygame.key.get_pressed()
             if keys[pygame.K_a] and config.Player.X > config.Player.X_MIN:
                 config.Player.X -= player_speed
             elif keys[pygame.K_d] and config.Player.X < config.Player.X_MAX:
                 config.Player.X += player_speed
 
 
-
-
             # Перевірка, чи може гравець стрибнути
             if not config.jump.IS_JUMP and keys[pygame.K_SPACE]:
                 config.jump.IS_JUMP = True
+
 
             # Логіка прижку
             if config.jump.IS_JUMP:

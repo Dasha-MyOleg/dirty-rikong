@@ -57,6 +57,7 @@ class Images:
     PLAYER_JUMP_DIR = BASE_DIR + 'player_jump/'
     PLAYER_L_DIR = BASE_DIR + 'player_left/'
     PLAYER_R_DIR = BASE_DIR + 'player_right/'
+    PLAYER_ATTAKING_DIR = BASE_DIR + 'player_attacking/'
 
     PLAYER_BASE      = PLAYER_R_DIR + 'right_1.png'
 
@@ -88,11 +89,22 @@ class Images:
         'right_4.png',
     ]
 
+    PLAYER_ATTAKING = [
+        'PlayerAttacking_1.png',
+        'PlayerAttacking_2.png',
+        'PlayerAttacking_3.png',
+        'PlayerAttacking_4.png',
+        'PlayerAttacking_5.png',
+        'PlayerAttacking_6.png',
+        'PlayerAttacking_7.png',
+    ]
+
 
 PLAYER_STAY_WALK = [Images.PLAYER_STAY_DIR + x for x in Images.PLAYER_STAY]
 PLAYER_JUMP_WALK = [Images.PLAYER_JUMP_DIR + x for x in Images.PLAYER_JUMP]
 PLAYER_L_WALK = [Images.PLAYER_L_DIR + x for x in Images.PLAYER_L]
 PLAYER_R_WALK = [Images.PLAYER_R_DIR + x for x in Images.PLAYER_R]
+PLAYER_ATTACKING_WALK = [Images.PLAYER_ATTAKING_DIR + x for x in Images.PLAYER_ATTAKING]
 
 
 class Background:
@@ -120,25 +132,16 @@ player_speed = 14
 
 
 #пересування гравця
-#walk_left  = [load_image(x) for x in PLAYER_L_WALK]
-# #walk_jump  = [load_image(x) for x in PLAYER_JUMP_WALK]
 
+walk_stay = [load_image(x) for x in PLAYER_STAY_WALK]
+walk_jump = [load_image(x) for x in PLAYER_JUMP_WALK]
+walk_left = [load_image(x) for x in PLAYER_L_WALK]
 walk_right = [load_image(x) for x in PLAYER_R_WALK]
+walk_attacking = [load_image(x) for x in PLAYER_ATTACKING_WALK]
 
-walk_stay = []
-for x in PLAYER_STAY_WALK:
-    img = load_image(x)
-    walk_stay.append(img)
 
-walk_left = []
-for x in PLAYER_L_WALK:
-    img = load_image(x)
-    walk_left.append(img)
 
-walk_jump = []
-for x in PLAYER_JUMP_WALK:
-    img = load_image(x)
-    walk_jump.append(img)
+
 
 class jump:
     IS_JUMP = False
@@ -177,11 +180,14 @@ class blasters:
     BLAST_WIDTH_HITBOX = Player.X + 100
     BLAST_HEIGHT_HITBOX= Player.Y + 127
 
+
+
 class ANIMATION_COUNT:
     ANIMATION_COUNT_JUMP = 1
     ANIMATION_COUNT_LEFT = 3
     ANIMATION_COUNT_RIGHT = 3
     ANIMATION_COUNT_STAY = 5
+    ANIMATION_COUNT_ATTACKING = 6
 
 
 
