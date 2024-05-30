@@ -1,6 +1,9 @@
 
+import pygame
 from .config import *
 from . import config
+from . import background
+from . import enemies
 
 
 def run_game():
@@ -11,21 +14,19 @@ def run_game():
     while running:
 
         #рух фону
-        bg_animation()
+        background.bg_animation()
 
         if gameplay:
-            player_hitbox = walk_left[0].get_rect(topleft=(config.Player.X, config.Player.Y))
-
 
             #пацюк в яких випадках зникає або закінчує гру
 
-            if config.rat.RAT_LIST_IN_GAME:
-                for (i, el) in enumerate(config.rat.RAT_LIST_IN_GAME):
-                    screen.blit(config.rat.RAT, el)
-                    el.x -= config.rat.RAT_SPEED
+            if enemies.rat.RAT_LIST_IN_GAME:
+                for (i, el) in enumerate(enemies.rat.RAT_LIST_IN_GAME):
+                    screen.blit(enemies.rat.RAT, el)
+                    el.x -= enemies.rat.RAT_SPEED
 
                     if el.x < config.ScConfig.HIDDEN_SIZE[0]:
-                        config.rat.RAT_LIST_IN_GAME.pop(i)
+                        enemies.rat.RAT_LIST_IN_GAME.pop(i)
 
                     if player_hitbox.colliderect(el):
                         gameplay = False
@@ -33,52 +34,56 @@ def run_game():
             #анімації на кнопках
             keys = pygame.key.get_pressed()
 
-
-
-            if keys[pygame.K_a] and not keys[pygame.K_SPACE] and not keys[pygame.K_f] and Player.Y >= 300 and not attacking_animation_playing:
-                screen.blit(walk_left[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_LEFT)],
-                            (config.Player.X, config.Player.Y))
-            elif keys[pygame.K_d] and not keys[pygame.K_SPACE] and not keys[pygame.K_f] and Player.Y >= 300 and not attacking_animation_playing:
-                screen.blit(walk_right[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_RIGHT)],
-                            (config.Player.X, config.Player.Y))
-            elif keys[pygame.K_SPACE] or Player.Y >= 520 and not attacking_animation_playing:
-                screen.blit(walk_jump[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_JUMP)],
-                            (config.Player.X, config.Player.Y))
-            elif keys[pygame.K_f] and config.blasters.BLASTERS_LEFT > 0:
-                 # Запустіть анімацію атаки, якщо вона ще не програвається
-                    if not attacking_animation_playing:
-                        attacking_animation_playing = True
-                        attacking_animation_frame = 0
+            if keys[pygame.K_s]:
+                player_hitbox = walk_crawls_on_ground[0].get_rect(topleft=(config.Player.X, config.Player.Y + 170))
             else:
-                if Player.Y >= 301 and not attacking_animation_playing:
-                    screen.blit(walk_stay[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_STAY)],
-                            (config.Player.X, config.Player.Y))
+                player_hitbox = walk_left[0].get_rect(topleft=(config.Player.X, config.Player.Y))
+
+
+            if keys[pygame.K_f] and config.blasters.BLASTERS_LEFT > 0:
+                # Запустіть анімацію атаки, якщо вона ще не програвається
+                if not attacking_animation_playing:
+                    attacking_animation_playing = True
+                    attacking_animation_frame = 0
+
+            # Логіка для анімації атаки
+            if attacking_animation_playing:
+                # Відобразіть поточний кадр анімації атаки
+                screen.blit(
+                    walk_attacking[min(attacking_animation_frame, config.ANIMATION_COUNT.ANIMATION_COUNT_ATTACKING)],
+                    (config.Player.X, config.Player.Y))
+                attacking_animation_frame += 1
+                # Перевірте, чи пройшов кінець анімації атаки
+                if attacking_animation_frame >= config.ANIMATION_COUNT.ANIMATION_COUNT_ATTACKING:
+                    attacking_animation_playing = False  # Зупиніть анімацію атаки
+                    attacking_animation_frame = 0  # Скинути кадр анімації атаки
+
+            # Логіка для інших дій гравця
+            else:
+                if keys[pygame.K_a] and not keys[pygame.K_SPACE] and not keys[pygame.K_f] and not keys[pygame.K_s] and Player.Y >= 300:
+                    screen.blit(walk_left[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_LEFT)],
+                                (config.Player.X, config.Player.Y))
+                elif keys[pygame.K_d] and not keys[pygame.K_SPACE] and not keys[pygame.K_f] and not keys[pygame.K_s] and Player.Y >= 300:
+                    screen.blit(walk_right[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_RIGHT)],
+                                (config.Player.X, config.Player.Y))
+                elif keys[pygame.K_s] and Player.Y >= 300 or keys[pygame.K_s] and keys[pygame.K_d] or keys[pygame.K_s] and keys[pygame.K_a]:
+                    screen.blit(walk_crawls_on_ground[
+                                    min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.PLAYER_CRAWLS_ON_GROUND_WALK)],
+                                (config.Player.X, config.Player.Y + 170))
                 else:
-                    if not attacking_animation_playing:
-                        screen.blit(walk_jump[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_JUMP)],
-                                 (config.Player.X, config.Player.Y))
-
-
-
-                # Якщо анімація атаки програється, відображайте кадр анімації
-                if attacking_animation_playing:
-                    # Перевірте, чи пройшов кінець анімації атаки
-                    if attacking_animation_frame >= config.ANIMATION_COUNT.ANIMATION_COUNT_ATTACKING:
-                        attacking_animation_playing = False  # Зупиніть анімацію атаки
-                        attacking_animation_frame = 0  # Скинути кадр анімації атаки
+                    if Player.Y >= 400:
+                        screen.blit(walk_stay[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_STAY)],
+                                    (config.Player.X, config.Player.Y))
                     else:
-                        # Відобразіть поточний кадр анімації атаки
-                        screen.blit(
-                            walk_attacking[min(attacking_animation_frame, config.ANIMATION_COUNT.ANIMATION_COUNT_ATTACKING)],
-                            (config.Player.X, config.Player.Y))
-                        attacking_animation_frame += 1
+                        screen.blit(walk_jump[min(config.Player.ANIMATION_COUNT, ANIMATION_COUNT.ANIMATION_COUNT_JUMP)],
+                                    (config.Player.X, config.Player.Y))
 
 
 
-                # Check if the player is on the ground to reset jump count
-            if config.Player.Y >= 420:
-                config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
-                config.jump.IS_JUMP = False
+            # якщо гравець виконує будь-яку дію окрім атаки.
+            if not keys[pygame.K_f] and not attacking_animation_playing:
+                attacking_animation_playing = False
+
 
 
             if keys[pygame.K_a] and config.Player.X > config.Player.X_MIN:
@@ -87,61 +92,98 @@ def run_game():
                 config.Player.X += player_speed
 
 
+
+            # Check if the player is on the ground to reset jump count
+            if config.Player.Y >= 420:
+                config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
+                config.jump.IS_JUMP = False
+
+
             # Перевірка, чи може гравець стрибнути
-            if not config.jump.IS_JUMP and keys[pygame.K_SPACE]:
+            if keys[pygame.K_SPACE] and not config.jump.IS_JUMP:
                 config.jump.IS_JUMP = True
+                config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
+                jump_press_time = 0
+                config.Player.start_Y = config.Player.Y
+
+            if keys[pygame.K_s]:
+                IS_JUMP = False
+
+            jump_press_time = 0
+            max_jump_time = 4
+            base_jump_strength = 1.8
 
 
-            # Логіка прижку
+            #при натисканні на 'S'  персонаж опускається на землю
+            if keys[pygame.K_s]:
+                config.Player.Y = 420
+                config.jump.IS_JUMP = False
+                config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
+                jump_press_time = 0  # Скидаємо час натискання
+
             if config.jump.IS_JUMP:
                 if config.jump.JUMP_COUNT >= -config.jump.JUMP_COUNT_START:
-                    if config.jump.JUMP_COUNT > 0:
-                        config.Player.Y -= (config.jump.JUMP_COUNT ** 2) / 3
-                        # Перевірка, чи досягнуто максимальної висоти
-                        if config.jump.JUMP_COUNT == 1:
-                            # Встановлення анімації прижку до максимальної висоти
-                            config.Player.ANIMATION_COUNT = ANIMATION_COUNT.ANIMATION_COUNT_JUMP
+                    if keys[pygame.K_SPACE] and config.jump.JUMP_COUNT > 0:
+                        jump_press_time += 1
+                        if jump_press_time > max_jump_time:
+                            jump_press_time = max_jump_time
+
+                        # вплив тривалісті натискання на прижок
+                        jump_strength = base_jump_strength + (jump_press_time / max_jump_time) * (
+                                    base_jump_strength - 1)
+                        config.Player.Y -= (config.jump.JUMP_COUNT ** 2) / (6 / jump_strength)
+                        config.jump.JUMP_COUNT -= 1
+
                     else:
-                        config.Player.Y += (config.jump.JUMP_COUNT ** 2) / 3
-                    config.jump.JUMP_COUNT -= 1
+                        # Якщо клавішу відпущено або JUMP_COUNT <= 0, персонаж починає падати
+                        if config.jump.JUMP_COUNT > 0:
+                            config.Player.Y += (config.jump.JUMP_COUNT ** 2) / (6 / jump_strength)
+                        else:
+                            config.Player.Y += (config.jump.JUMP_COUNT ** 2) / (6 / jump_strength)
+                        config.jump.JUMP_COUNT -= 1
+
+                        # Завершення стрибка, коли персонаж приземлився
+                        if config.jump.JUMP_COUNT < -config.jump.JUMP_COUNT_START:
+                            config.jump.IS_JUMP = False
+                            config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
+                            config.Player.Y = 420
+                            jump_press_time = 0
+
                 else:
+                    # Завершення стрибка
                     config.jump.IS_JUMP = False
                     config.jump.JUMP_COUNT = config.jump.JUMP_COUNT_START
+                    jump_press_time = 0
 
 
 
-
-
-    #перебирання кадрів гравця
-
-
-            # Оновлення лічильника анімації
+              # Оновлення лічильника анімації
             if config.Player.ANIMATION_COUNT >= max(ANIMATION_COUNT.ANIMATION_COUNT_LEFT,
-                                                    ANIMATION_COUNT.ANIMATION_COUNT_RIGHT,
-                                                    ANIMATION_COUNT.ANIMATION_COUNT_JUMP,
-                                                    ANIMATION_COUNT.ANIMATION_COUNT_STAY):
+                                                ANIMATION_COUNT.ANIMATION_COUNT_RIGHT,
+                                                ANIMATION_COUNT.ANIMATION_COUNT_JUMP,
+                                                ANIMATION_COUNT.ANIMATION_COUNT_STAY,
+                                                ANIMATION_COUNT.PLAYER_CRAWLS_ON_GROUND_WALK):
                 config.Player.ANIMATION_COUNT = 0
             else:
                 config.Player.ANIMATION_COUNT += 1
 
 
-    # задній фон рух
-            config.Background.BG_SKY_X -= config.Background.BG_SKY_SPEED
-            if config.Background.BG_SKY_X == -config.Background.BG_WIDTH_END:
-                config.Background.BG_SKY_X = config.Background.BG_WIDTH_START
+            # задній фон рух
+            background.Background.BG_SKY_X -= background.Background.BG_SKY_SPEED
+            if background.Background.BG_SKY_X == -background.Background.BG_WIDTH_END:
+                background.Background.BG_SKY_X = background.Background.BG_WIDTH_START
 
-            config.Background.BG_MOUNTAIN_BACK_X -= config.Background.BG_MOUNTAIN_BACK_SPEED
-            if config.Background.BG_MOUNTAIN_BACK_X == -config.Background.BG_WIDTH_END:
-                config.Background.BG_MOUNTAIN_BACK_X = config.Background.BG_WIDTH_START
+            background.Background.BG_MOUNTAIN_BACK_X -= background.Background.BG_MOUNTAIN_BACK_SPEED
+            if background.Background.BG_MOUNTAIN_BACK_X == -background.Background.BG_WIDTH_END:
+                background.Background.BG_MOUNTAIN_BACK_X = background.Background.BG_WIDTH_START
 
-            config.Background.BG_MOUNTAIN_FRONT_X -= config.Background.BG_MOUNTAIN_FRONT_SPEED
-            if config.Background.BG_MOUNTAIN_FRONT_X == -config.Background.BG_WIDTH_END:
-                config.Background.BG_MOUNTAIN_FRONT_X = config.Background.BG_WIDTH_START
+            background.Background.BG_MOUNTAIN_FRONT_X -= background.Background.BG_MOUNTAIN_FRONT_SPEED
+            if background.Background.BG_MOUNTAIN_FRONT_X == -background.Background.BG_WIDTH_END:
+                background.Background.BG_MOUNTAIN_FRONT_X = background.Background.BG_WIDTH_START
 
-            config.Background.BG_GRASS_X -= config.Background.BG_GRASS_SPEED
-            if config.Background.BG_GRASS_X == -config.Background.BG_WIDTH_END:
-                config.Background.BG_GRASS_X = config.Background.BG_WIDTH_START
-
+            background.Background.BG_GRASS_X -= background.Background.BG_GRASS_SPEED
+            if background.Background.BG_GRASS_X == -background.Background.BG_WIDTH_END:
+                background.Background.BG_GRASS_X = background.Background.BG_WIDTH_START
 
             #бластери/постріли
 
@@ -151,20 +193,19 @@ def run_game():
                 screen.blit(config.blasters.BLAST, (el.x, el.y))
                 el.x += config.blasters.BLAST_SPEED
 
+
                 if el.x > config.ScConfig.HIDDEN_SIZE[1]:
-                    # Видаляємо елемент з оригінального списку
-                    config.blasters.BLASTS.remove(el)
-                    config.blasters.BLASTERS_LEFT += 1
+                # Видаляємо елемент з оригінального списку
+                   config.blasters.BLASTS.remove(el)
+                   config.blasters.BLASTERS_LEFT += 1
 
-                if config.rat.RAT_LIST_IN_GAME:
-                    for (idex, rat_el) in enumerate(config.rat.RAT_LIST_IN_GAME):
-                        if el.colliderect(rat_el):
-                            config.rat.RAT_LIST_IN_GAME.pop(idex)
-                            config.blasters.BLASTS.remove(el)
-                            config.blasters.BLASTERS_LEFT += 1
+                if enemies.rat.RAT_LIST_IN_GAME:
+                    for (idex, rat_el) in enumerate(enemies.rat.RAT_LIST_IN_GAME):
+                       if el.colliderect(rat_el):
+                           enemies.rat.RAT_LIST_IN_GAME.pop(idex)
+                           config.blasters.BLASTS.remove(el)
+                           config.blasters.BLASTERS_LEFT += 1
 
-
-            #screen.blit(square, (230, 380))
 
             #фпс гри
             clock.tick(GAME_SPEED)
@@ -181,8 +222,9 @@ def run_game():
 
             if restart_label_rect.collidepoint(mouse) and pygame.mouse.get_pressed()[0]:
                 gameplay = True
+                config.blasters.BLASTERS_LEFT = 3
                 config.Player.X = 10
-                config.rat.RAT_LIST_IN_GAME.clear()
+                enemies.rat.RAT_LIST_IN_GAME.clear()
                 config.blasters.BLASTS.clear()
 
 
@@ -197,8 +239,8 @@ def run_game():
 
 
             #де з'являються пацюки
-            if event.type == config.rat.RAT_TIMER:
-                config.rat.RAT_LIST_IN_GAME.append(config.rat.RAT.get_rect(topleft=(config.rat.RAT_WIDTH_HITBOX, config.rat.RAT_HEIGHT_HITBOX)))
+            if event.type == enemies.rat.RAT_TIMER:
+                enemies.rat.RAT_LIST_IN_GAME.append(enemies.rat.RAT.get_rect(topleft=(enemies.rat.RAT_WIDTH_SPAWN, enemies.rat.RAT_HEIGHT_SPAWN)))
 
             #обмеження кікості бластерів/пострілів і де вони з'являються
             if gameplay and event.type == pygame.KEYUP and event.key == pygame.K_f and config.blasters.BLASTERS_LEFT > 0:

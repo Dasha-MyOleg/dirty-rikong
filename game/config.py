@@ -57,7 +57,8 @@ class Images:
     PLAYER_JUMP_DIR = BASE_DIR + 'player_jump/'
     PLAYER_L_DIR = BASE_DIR + 'player_left/'
     PLAYER_R_DIR = BASE_DIR + 'player_right/'
-    PLAYER_ATTAKING_DIR = BASE_DIR + 'player_attacking/'
+    PLAYER_ATTACKING_DIR = BASE_DIR + 'player_attacking/'
+    PLAYER_CRAWLS_ON_GROUND_DIR = BASE_DIR + 'player_povze/'
 
     PLAYER_BASE      = PLAYER_R_DIR + 'right_1.png'
 
@@ -89,7 +90,7 @@ class Images:
         'right_4.png',
     ]
 
-    PLAYER_ATTAKING = [
+    PLAYER_ATTACKING = [
         'PlayerAttacking_1.png',
         'PlayerAttacking_2.png',
         'PlayerAttacking_3.png',
@@ -99,36 +100,27 @@ class Images:
         'PlayerAttacking_7.png',
     ]
 
+    PLAYER_CRAWLS_ON_GROUND = [
+        'Povze_1.png',
+        'Povze_2.png',
+        'Povze_3.png',
+        'Povze_4.png',
+        'Povze_5.png',
+        'Povze_6.png',
+    ]
+
 
 PLAYER_STAY_WALK = [Images.PLAYER_STAY_DIR + x for x in Images.PLAYER_STAY]
 PLAYER_JUMP_WALK = [Images.PLAYER_JUMP_DIR + x for x in Images.PLAYER_JUMP]
 PLAYER_L_WALK = [Images.PLAYER_L_DIR + x for x in Images.PLAYER_L]
 PLAYER_R_WALK = [Images.PLAYER_R_DIR + x for x in Images.PLAYER_R]
-PLAYER_ATTACKING_WALK = [Images.PLAYER_ATTAKING_DIR + x for x in Images.PLAYER_ATTAKING]
-
-
-class Background:
-    BG_WIDTH_START = 0
-    BG_WIDTH_END = 2500
-
-    BG_SKY = pygame.image.load('images/bg/bg_sky.png').convert_alpha()
-    BG_SKY_X = 0
-    BG_MOUNTAIN_BACK = pygame.image.load('images/bg/bg_mountain_back.png').convert_alpha()
-    BG_MOUNTAIN_BACK_X = 0
-    BG_MOUNTAIN_FRONT = pygame.image.load('images/bg/bg_mountain_front.png').convert_alpha()
-    BG_MOUNTAIN_FRONT_X = 0
-    BG_GRASS = pygame.image.load('images/bg/bg_grass.png').convert_alpha()
-    BG_GRASS_X = 0
-
-    BG_SKY_SPEED = 2
-    BG_MOUNTAIN_BACK_SPEED = 4
-    BG_MOUNTAIN_FRONT_SPEED = 10
-    BG_GRASS_SPEED = 20
+PLAYER_ATTACKING_WALK = [Images.PLAYER_ATTACKING_DIR + x for x in Images.PLAYER_ATTACKING]
+PLAYER_CRAWLS_ON_GROUND_WALK = [Images.PLAYER_CRAWLS_ON_GROUND_DIR + x for x in Images.PLAYER_CRAWLS_ON_GROUND]
 
 
 #гравець
 player = load_image(Images.PLAYER_BASE, alpha=False)
-player_speed = 14
+player_speed = 12
 
 
 #пересування гравця
@@ -138,9 +130,7 @@ walk_jump = [load_image(x) for x in PLAYER_JUMP_WALK]
 walk_left = [load_image(x) for x in PLAYER_L_WALK]
 walk_right = [load_image(x) for x in PLAYER_R_WALK]
 walk_attacking = [load_image(x) for x in PLAYER_ATTACKING_WALK]
-
-
-
+walk_crawls_on_ground = [load_image(x) for x in PLAYER_CRAWLS_ON_GROUND_WALK]
 
 
 class jump:
@@ -148,27 +138,13 @@ class jump:
     JUMP_COUNT_START = 15
     JUMP_COUNT = JUMP_COUNT_START
 
-
-
-#картинки заднього фону
-
-
+class player_hit_box:
+    walking_hit_box = walk_left[0]
+    walk_crawls_on_ground_hit_box = walk_crawls_on_ground[0]
 
 #музика
 bg_sound = pygame.mixer.Sound('sounds/soundtrack.mp3')
 bg_sound.play()
-
-#пацюк
-class rat:
-    RAT_WIDTH_HITBOX = 1265
-    RAT_HEIGHT_HITBOX = 450
-    RAT_TIMER = pygame.USEREVENT + 1
-    RAT = pygame.image.load('images/rat.png').convert_alpha()
-    RAT_LIST_IN_GAME = []
-    RAT_SPEED = 20
-    RAT_PER_MILLISECOND = 5000
-    pygame.time.set_timer(RAT_TIMER, RAT_PER_MILLISECOND)
-
 
 
 #бластер
@@ -188,9 +164,7 @@ class ANIMATION_COUNT:
     ANIMATION_COUNT_RIGHT = 3
     ANIMATION_COUNT_STAY = 5
     ANIMATION_COUNT_ATTACKING = 6
-
-
-
+    PLAYER_CRAWLS_ON_GROUND_WALK = 5
 
 
 
@@ -205,20 +179,4 @@ lose_label_location = (30,40)
 restart_label_location = (30,200)
 restart_label_rect = restart_label.get_rect(topleft=(restart_label_location))
 
-def bg_animation():
-    """
-    Background animation.
-    Used as a base background screen throughout the game.
-    Contains grass, mountains and sky.
-    """
-    width = Background.BG_WIDTH_START
-
-    screen.blit(Background.BG_SKY, (Background.BG_SKY_X, width))
-    screen.blit(Background.BG_SKY, (Background.BG_SKY_X + Background.BG_WIDTH_END, Background.BG_WIDTH_START))
-    screen.blit(Background.BG_MOUNTAIN_BACK, (Background.BG_MOUNTAIN_BACK_X, Background.BG_WIDTH_START))
-    screen.blit(Background.BG_MOUNTAIN_BACK, (Background.BG_MOUNTAIN_BACK_X + Background.BG_WIDTH_END, Background.BG_WIDTH_START))
-    screen.blit(Background.BG_MOUNTAIN_FRONT, (Background.BG_MOUNTAIN_FRONT_X, Background.BG_WIDTH_START))
-    screen.blit(Background.BG_MOUNTAIN_FRONT, (Background.BG_MOUNTAIN_FRONT_X + Background.BG_WIDTH_END, Background.BG_WIDTH_START))
-    screen.blit(Background.BG_GRASS, (Background.BG_GRASS_X, Background.BG_WIDTH_START))
-    screen.blit(Background.BG_GRASS, (Background.BG_GRASS_X + Background.BG_WIDTH_END, Background.BG_WIDTH_START))
 
