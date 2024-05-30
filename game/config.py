@@ -1,6 +1,3 @@
-
-#from typing import Dict, Any
-
 import pygame
 pygame.init()
 
@@ -20,7 +17,7 @@ def load_image(path, alpha=True):
 class ScConfig:
     SIZE        = (1280, 720)
     START_SIZE  = (0, 0)
-    HIDDEN_SIZE = (-200, 1360)
+    HIDDEN_SIZE = (-400, 1360)
 
 
 class PgDisplay:

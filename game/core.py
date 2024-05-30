@@ -18,21 +18,11 @@ def run_game():
 
         if gameplay:
 
-            #пацюк в яких випадках зникає або закінчує гру
-
-            if enemies.rat.RAT_LIST_IN_GAME:
-                for (i, el) in enumerate(enemies.rat.RAT_LIST_IN_GAME):
-                    screen.blit(enemies.rat.RAT, el)
-                    el.x -= enemies.rat.RAT_SPEED
-
-                    if el.x < config.ScConfig.HIDDEN_SIZE[0]:
-                        enemies.rat.RAT_LIST_IN_GAME.pop(i)
-
-                    if player_hitbox.colliderect(el):
-                        gameplay = False
 
             #анімації на кнопках
             keys = pygame.key.get_pressed()
+
+
 
             if keys[pygame.K_s]:
                 player_hitbox = walk_crawls_on_ground[0].get_rect(topleft=(config.Player.X, config.Player.Y + 170))
@@ -185,6 +175,38 @@ def run_game():
             if background.Background.BG_GRASS_X == -background.Background.BG_WIDTH_END:
                 background.Background.BG_GRASS_X = background.Background.BG_WIDTH_START
 
+
+
+            # пацюк в яких випадках зникає або закінчує гру
+            if enemies.rat.RAT_LIST_IN_GAME:
+                for (i, el) in enumerate(enemies.rat.RAT_LIST_IN_GAME):
+                    screen.blit(enemies.rat.RAT, el)
+                    el.x -= enemies.rat.RAT_SPEED
+
+                    if el.x < config.ScConfig.HIDDEN_SIZE[0]:
+                        enemies.rat.RAT_LIST_IN_GAME.pop(i)
+
+                    if player_hitbox.colliderect(el):
+                        gameplay = False
+
+
+
+
+            # озеро в яких випадках зникає або закінчує гру
+            if enemies.lake.LAKE_LIST_IN_GAME:
+                for (i, el) in enumerate(enemies.lake.LAKE_LIST_IN_GAME):
+                    screen.blit(enemies.lake.LAKE, el)
+                    el.x -= enemies.lake.LAKE_SPEED
+
+                    if el.x < config.ScConfig.HIDDEN_SIZE[0]:
+                        enemies.lake.LAKE_LIST_IN_GAME.pop(i)
+
+                    if player_hitbox.colliderect(el):
+                        gameplay = False
+
+
+
+
             #бластери/постріли
 
             blasts_copy = config.blasters.BLASTS.copy()
@@ -207,6 +229,9 @@ def run_game():
                            config.blasters.BLASTERS_LEFT += 1
 
 
+
+
+
             #фпс гри
             clock.tick(GAME_SPEED)
 
@@ -225,6 +250,7 @@ def run_game():
                 config.blasters.BLASTERS_LEFT = 3
                 config.Player.X = 10
                 enemies.rat.RAT_LIST_IN_GAME.clear()
+                enemies.lake.LAKE_LIST_IN_GAME.clear()
                 config.blasters.BLASTS.clear()
 
 
@@ -241,6 +267,13 @@ def run_game():
             #де з'являються пацюки
             if event.type == enemies.rat.RAT_TIMER:
                 enemies.rat.RAT_LIST_IN_GAME.append(enemies.rat.RAT.get_rect(topleft=(enemies.rat.RAT_WIDTH_SPAWN, enemies.rat.RAT_HEIGHT_SPAWN)))
+
+            # де з'являютється озера
+            if event.type == enemies.lake.LAKE_TIMER:
+                enemies.lake.LAKE_LIST_IN_GAME.append(
+                    enemies.lake.LAKE.get_rect(topleft=(enemies.lake.LAKE_WIDTH_SPAWN, enemies.lake.LAKE_HEIGHT_SPAWN)))
+
+
 
             #обмеження кікості бластерів/пострілів і де вони з'являються
             if gameplay and event.type == pygame.KEYUP and event.key == pygame.K_f and config.blasters.BLASTERS_LEFT > 0:
