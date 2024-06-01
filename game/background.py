@@ -28,6 +28,7 @@ class Background:
     BG_GRASS = pygame.image.load('images/bg/bg_grass.png').convert_alpha()
     BG_GRASS_X = 0
 
+    # Швидкість фону
     BG_SKY_SPEED = 2
     BG_MOUNTAIN_BACK_SPEED = 4
     BG_MOUNTAIN_FRONT_SPEED = 10
@@ -36,7 +37,7 @@ class Background:
 
 
 def bg_animation():
-
+    # Картинки фонів йдуть одна за одною, щоб не було розриву картинок
     width = Background.BG_WIDTH_START
 
     screen.blit(Background.BG_SKY, (Background.BG_SKY_X, width))
