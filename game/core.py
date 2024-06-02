@@ -6,7 +6,7 @@ from . import background
 from . import enemies
 from . import screen_start
 from . import functions
-
+import random
 
 # Стан гри
 START = 0
@@ -20,7 +20,8 @@ pygame.init()
 # Глобальна змінна стану гри
 game_state = START
 
-
+#enemies.rat.set_random_timer(self)
+#enemies.lake.set_random_timer(self)
 #config.logger.info(1111)
 #config.logger.info(f'game_state {game_state}')
 
@@ -32,6 +33,12 @@ def run_game():
     running = True
     attacking_animation_playing = False
     attacking_animation_frame = 0
+
+    rat_instance = enemies.rat()
+    lake_instance = enemies.lake()
+    frog_instance = enemies.frog()
+
+    frog_jump_up = True
 
     #івекнти гри
     while running:
@@ -206,9 +213,31 @@ def run_game():
 
             functions.bg_animation(background)
 
+            #додавання ворогів
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    pygame.quit()
 
+                #додавання крис
+                if event.type == rat_instance.RAT_TIMER:
+                    enemies.rat.add_rat()
 
-            # пацюк в яких випадках зникає або закінчує гру
+                #додавання озера
+                if event.type == lake_instance.LAKE_TIMER:
+                    enemies.lake.LAKE_LIST_IN_GAME.append(
+                        lake_instance.LAKE.get_rect(
+                            topleft=(lake_instance.LAKE_WIDTH_SPAWN, lake_instance.LAKE_HEIGHT_SPAWN)))
+                    lake_instance.set_random_timer()
+
+                #додавання жаби
+                if event.type == frog_instance.FROG_TIMER:
+                    enemies.frog.add_frog()
+
+                for frog_instance in enemies.frog.FROG_LIST_IN_GAME:
+                    frog_instance.jump()
+
+            #Якщо криска додана у гру
             if enemies.rat.RAT_LIST_IN_GAME:
                 for (i, el) in enumerate(enemies.rat.RAT_LIST_IN_GAME):
                     screen.blit(enemies.rat.RAT, el)
@@ -222,10 +251,37 @@ def run_game():
                     if player_hitbox.colliderect(el):
                         game_state = GAME_OVER
 
+            #якщо жабка додана у гру
+            if enemies.frog.FROG_LIST_IN_GAME:
+                for frog_instance in enemies.frog.FROG_LIST_IN_GAME:
+                    frog_instance.jump()  # Виклик методу прижка
+                    frog_instance.draw(screen)  # Виклик методу малювання
 
+                for (i, el) in enumerate(enemies.frog.FROG_LIST_IN_GAME):
+                    #screen.blit(enemies.frog.FROG, el.frog_rect)
+                    el.frog_rect.x -= enemies.frog.FROG_SPEED
 
+                    #чи це прижок вверх
+                    if el.frog_rect.y <= 100:
+                        el.jump_up = False
+                    elif el.frog_rect.y >= 600:
+                        el.jump_up = True
 
-            # озеро в яких випадках зникає або закінчує гру
+                    #як відбувається прижок
+                    if el.jump_up:
+                        el.frog_rect.y -= 10  # jump up
+                    else:
+                        el.frog_rect.y += 10  # fall down
+
+                    #Знищення при виходженні за рамки
+                    if el.frog_rect.x < config.ScConfig.HIDDEN_SIZE[0]:
+                        enemies.frog.FROG_LIST_IN_GAME.pop(i)
+
+                    #кінець гри при дотику до жабки
+                    if player_hitbox.colliderect(el.frog_rect):
+                        game_state = GAME_OVER
+
+            # Якщо озеро було додано до гемплею
             if enemies.lake.LAKE_LIST_IN_GAME:
                 for (i, el) in enumerate(enemies.lake.LAKE_LIST_IN_GAME):
                     screen.blit(enemies.lake.LAKE, el)
@@ -238,30 +294,6 @@ def run_game():
                     # Програш гри при доторканні гравця до хітбоксу
                     if player_hitbox.colliderect(el):
                         game_state = GAME_OVER
-
-
-
-
-
-            # бластери/постріли
-            blasts_copy = config.blasters.BLASTS.copy()
-
-            for el in blasts_copy:
-                screen.blit(config.blasters.BLAST, (el.x, el.y))
-                el.x += config.blasters.BLAST_SPEED
-
-                # Видалення бластерів поза межею екрана
-                if el.x > config.ScConfig.HIDDEN_SIZE[1]:
-                    config.blasters.BLASTS.remove(el)
-                    config.blasters.BLASTERS_LEFT += 1
-
-                #знищення криси при доторканні з брастером
-                if enemies.rat.RAT_LIST_IN_GAME:
-                    for (idex, rat_el) in enumerate(enemies.rat.RAT_LIST_IN_GAME):
-                        if el.colliderect(rat_el):
-                            enemies.rat.RAT_LIST_IN_GAME.pop(idex)
-                            config.blasters.BLASTS.remove(el)
-                            config.blasters.BLASTERS_LEFT += 1
 
 
             # фпс гри
@@ -277,6 +309,7 @@ def run_game():
             screen.blit(lose_label, lose_label_location)
             screen.blit(restart_label, restart_label_rect)
 
+
             mouse = pygame.mouse.get_pos()
             #if restart button clik
             if restart_label_rect.collidepoint(mouse) and pygame.mouse.get_pressed()[0]:
@@ -286,6 +319,7 @@ def run_game():
                 config.Player.X = 10
                 enemies.rat.RAT_LIST_IN_GAME.clear()
                 enemies.lake.LAKE_LIST_IN_GAME.clear()
+                enemies.frog.FROG_LIST_IN_GAME.clear()
                 config.blasters.BLASTS.clear()
                 gameplay = False
 
@@ -296,17 +330,6 @@ def run_game():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
-
-
-            # де з'являються пацюки
-            if event.type == enemies.rat.RAT_TIMER:
-                enemies.rat.RAT_LIST_IN_GAME.append(
-                    enemies.rat.RAT.get_rect(topleft=(enemies.rat.RAT_WIDTH_SPAWN, enemies.rat.RAT_HEIGHT_SPAWN)))
-
-            # де з'являються озера
-            if event.type == enemies.lake.LAKE_TIMER:
-                enemies.lake.LAKE_LIST_IN_GAME.append(
-                    enemies.lake.LAKE.get_rect(topleft=(enemies.lake.LAKE_WIDTH_SPAWN, enemies.lake.LAKE_HEIGHT_SPAWN)))
 
             # обмеження кількості бластерів/пострілів і де вони з'являються
             if gameplay and event.type == pygame.KEYUP and event.key == pygame.K_f and config.blasters.BLASTERS_LEFT > 0:
