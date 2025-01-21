@@ -31,7 +31,15 @@ def listen_game_mode(restart_button_rect, game_state):
 
 
 def main_menu_movement(screen, screen_start):
+    """
 
+    Args:
+        screen: Rokgs
+        screen_start: dytfugihuoj
+
+    Returns:
+
+    """
     # Рух змії, головний екран
     if screen_start.Pictures_Y.SNAKE_Y >= 0:
         if screen_start.Pictures_Y.SNAKE_Y >= 10:

@@ -14,7 +14,7 @@ class rat:
     RAT_SPEED = 25
 
     def __init__(self):
-        self.RAT_PER_MILLISECOND = random.randint(50, 100)
+        self.RAT_PER_MILLISECOND = random.randint(200, 400)
         pygame.time.set_timer(self.RAT_TIMER, self.RAT_PER_MILLISECOND)
 
     @staticmethod
@@ -36,7 +36,7 @@ class lake:
         self.set_random_timer()
 
     def set_random_timer(self):
-        self.LAKE_PER_MILLISECOND = random.randint(110, 500)
+        self.LAKE_PER_MILLISECOND = random.randint(700, 1200)
         pygame.time.set_timer(self.LAKE_TIMER, self.LAKE_PER_MILLISECOND)
 
 # жаба
@@ -53,7 +53,7 @@ class frog:
     def __init__(self):
         #рандомна поява жаб
         self.frog_rect = frog.FROG.get_rect(topleft=(frog.FROG_WIDTH_SPAWN, frog.FROG_HEIGHT_SPAWN))
-        self.FROG_PER_MILLISECOND = random.randint(30, 400)
+        self.FROG_PER_MILLISECOND = random.randint(100, 400)
         pygame.time.set_timer(self.FROG_TIMER, self.FROG_PER_MILLISECOND)
         self.jump_up = True  # Початковий стан прижка жаби
         # Останній кадр анімації
